@@ -468,6 +468,7 @@ export default function Hero({
   const leafRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shadowFrontRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shadowBackRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const spineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Only set up 3D scroll-driven book flipping on desktop screens
@@ -532,6 +533,28 @@ export default function Hero({
               ease: "power1.out",
             },
             i + 0.5
+          );
+        }
+
+        // Spine depth effect (fades in when page begins to turn, fades out when it lands flat)
+        if (spineRef.current) {
+          tl.fromTo(
+            spineRef.current,
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 0.25,
+              ease: "power1.in",
+            },
+            i
+          ).to(
+            spineRef.current,
+            {
+              opacity: 0,
+              duration: 0.25,
+              ease: "power1.out",
+            },
+            i + 0.75
           );
         }
 
@@ -820,17 +843,18 @@ export default function Hero({
                   </div>
                 </div>
 
-                {/* 4. FIXED CENTER SPINE (The Hinge Down the Middle) */}
+                {/* 4. FIXED CENTER SPINE (Depth & crease only visible while turning, hidden when flat) */}
                 <div
+                  ref={spineRef}
                   aria-hidden="true"
-                  className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 sm:w-10 z-30 pointer-events-none"
+                  className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 sm:w-10 z-30 pointer-events-none opacity-0"
                   style={{
                     background:
-                      "linear-gradient(to right, transparent, rgba(0, 0, 0, 0.03) 25%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.03) 75%, transparent)",
+                      "linear-gradient(to right, transparent, rgba(0, 0, 0, 0.04) 25%, rgba(0, 0, 0, 0.16) 50%, rgba(0, 0, 0, 0.04) 75%, transparent)",
                   }}
                 >
                   {/* Spine Center Dashed Stitch Seam */}
-                  <div className="absolute top-4 bottom-4 left-1/2 -translate-x-1/2 w-px border-r border-dashed border-black/20" />
+                  <div className="absolute top-4 bottom-4 left-1/2 -translate-x-1/2 w-px border-r border-dashed border-black/25" />
                 </div>
               </div>
 
