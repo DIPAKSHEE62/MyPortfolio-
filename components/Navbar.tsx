@@ -76,19 +76,10 @@ function NavTabShape({ fillColor, isActive }: NavTabShapeProps) {
       aria-hidden="true"
       className="absolute inset-0 w-full h-full pointer-events-none transition-all duration-200"
     >
-      {/* 1. Filled flap body */}
       <path
         d="M 22 0 L 78 0 C 82 0 85 1.5 87 5 L 98 37 C 99 39 99.5 40 100 40 L 0 40 C 0.5 40 1 39 2 37 L 13 5 C 15 1.5 18 0 22 0 Z"
         fill={fillColor}
         className={isActive ? "brightness-105" : "brightness-100"}
-      />
-      {/* 2. Border on upper 3 sides only (left slant, top edge, right slant) */}
-      <path
-        d="M 0 40 C 0.5 40 1 39 2 37 L 13 5 C 15 1.5 18 0 22 0 L 78 0 C 82 0 85 1.5 87 5 L 98 37 C 99 39 99.5 40 100 40"
-        fill="none"
-        stroke={isActive ? "rgba(0, 0, 0, 0.24)" : "rgba(0, 0, 0, 0.16)"}
-        strokeWidth="2"
-        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );
@@ -113,7 +104,7 @@ export default function Navbar() {
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         hasScrolled
           ? "bg-canvas/92 backdrop-blur-md border-b border-hairline shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
-          : "bg-canvas border-b border-hairline"
+          : "bg-canvas "
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 flex items-end justify-between md:justify-center relative h-16">
@@ -184,7 +175,7 @@ export default function Navbar() {
 
                 return (
                   <motion.div
-                    key={item.id}
+                    key={item.id} 
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.04 }}

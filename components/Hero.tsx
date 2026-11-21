@@ -84,6 +84,7 @@ export default function Hero() {
                   src="/cello_tape.png"
                   alt=""
                   fill
+                  sizes="(min-width: 640px) 144px, 112px"
                   className="object-contain"
                   priority
                 />
@@ -95,6 +96,7 @@ export default function Hero() {
                   src="/cello_tape.png"
                   alt=""
                   fill
+                  sizes="(min-width: 640px) 144px, 112px"
                   className="object-contain"
                   priority
                 />
