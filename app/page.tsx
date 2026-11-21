@@ -11,7 +11,7 @@ export default function Home() {
     NAVIGATION_ITEMS[0];
 
   return (
-    <main className="min-h-screen bg-canvas flex flex-col justify-center">
+    <main className="min-h-screen bg-canvas">
       <Navbar activeItemId={activeItemId} onSelectTab={setActiveItemId} />
       <Hero
         activeColor={activeItem.theme.active}
