@@ -65,3 +65,10 @@ body {
   color: var(--color-ink);
   min-height: 100vh;
 }
+
+/* Dotted Paper Pattern (Bullet Journal / Dot Grid Notebook) */
+.dotted-paper-pattern {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.22) 1.5px, transparent 1.5px) !important;
+  background-size: 24px 24px !important;
+  background-repeat: repeat !important;
+}
