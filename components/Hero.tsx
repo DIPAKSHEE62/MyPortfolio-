@@ -70,9 +70,9 @@ interface FlapProps {
 function RightFlap({ item, slotIndex, onTabClick }: FlapProps) {
   return (
     <div
-      className="absolute left-full w-9 sm:w-10 lg:w-11 h-[14%] min-h-[72px] max-h-[108px] z-30 pointer-events-auto filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.06)] cursor-pointer select-none"
+      className="absolute left-full w-9 sm:w-10 lg:w-11 h-[18%] z-30 pointer-events-auto filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.06)] cursor-pointer select-none"
       style={{
-        top: `${slotIndex * 19 + 4}%`,
+        top: `${slotIndex * 18 + 4}%`,
       }}
       onClick={(e) => onTabClick(item.id, e)}
       title={`Navigate to ${item.label}`}
@@ -90,9 +90,9 @@ function RightFlap({ item, slotIndex, onTabClick }: FlapProps) {
 function LeftFlap({ item, slotIndex, onTabClick }: FlapProps) {
   return (
     <div
-      className="absolute right-full w-9 sm:w-10 lg:w-11 h-[14%] min-h-[72px] max-h-[108px] z-30 pointer-events-auto filter drop-shadow-[-2px_2px_4px_rgba(0,0,0,0.06)] cursor-pointer select-none"
+      className="absolute right-full w-9 sm:w-10 lg:w-11 h-[18%] z-30 pointer-events-auto filter drop-shadow-[-2px_2px_4px_rgba(0,0,0,0.06)] cursor-pointer select-none"
       style={{
-        top: `${slotIndex * 19 + 4}%`,
+        top: `${slotIndex * 18 + 4}%`,
       }}
       onClick={(e) => onTabClick(item.id, e)}
       title={`Navigate to ${item.label}`}
