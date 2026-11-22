@@ -45,6 +45,68 @@ function SideTabShape({ fillColor }: SideTabShapeProps) {
   );
 }
 
+function LeftTabShape({ fillColor }: SideTabShapeProps) {
+  return (
+    <svg
+      viewBox="0 0 42 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      className="absolute inset-0 w-full h-full pointer-events-none"
+    >
+      <path
+        d="M 40 0 C 39.2 0 38.2 0.4 37.2 1.2 L 3 11 C 1 12 0 14 0 16 L 0 84 C 0 86 1 88 3 89 L 37.2 98.8 C 38.2 99.6 39.2 100 40 100 L 42 100 L 42 0 Z"
+        fill={fillColor}
+      />
+    </svg>
+  );
+}
+
+interface FlapProps {
+  item: (typeof NAVIGATION_ITEMS)[number];
+  slotIndex: number;
+  onTabClick: (id: string, e: React.MouseEvent) => void;
+}
+
+function RightFlap({ item, slotIndex, onTabClick }: FlapProps) {
+  return (
+    <div
+      className="absolute left-full w-10 sm:w-11 h-26 sm:h-28 z-30 pointer-events-auto filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.06)] cursor-pointer select-none"
+      style={{
+        top: `calc(30px + ${slotIndex} * 122px)`,
+      }}
+      onClick={(e) => onTabClick(item.id, e)}
+      title={`Navigate to ${item.label}`}
+    >
+      <div className="relative flex items-center justify-center w-full h-full py-3 text-ink">
+        <SideTabShape fillColor={item.theme.active} />
+        <span className="relative z-10 text-[11px] sm:text-[12px] font-medium tracking-wider uppercase [writing-mode:vertical-rl] rotate-180 select-none text-ink/85">
+          {item.label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function LeftFlap({ item, slotIndex, onTabClick }: FlapProps) {
+  return (
+    <div
+      className="absolute right-full w-10 sm:w-11 h-26 sm:h-28 z-30 pointer-events-auto filter drop-shadow-[-2px_2px_4px_rgba(0,0,0,0.06)] cursor-pointer select-none"
+      style={{
+        top: `calc(30px + ${slotIndex} * 122px)`,
+      }}
+      onClick={(e) => onTabClick(item.id, e)}
+      title={`Navigate to ${item.label}`}
+    >
+      <div className="relative flex items-center justify-center w-full h-full py-3 text-ink">
+        <LeftTabShape fillColor={item.theme.active} />
+        <span className="relative z-10 text-[11px] sm:text-[12px] font-medium tracking-wider uppercase [writing-mode:vertical-rl] rotate-180 select-none text-ink/85">
+          {item.label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* =========================================================================
    PAGE SPREAD CONTENTS (5 SECTIONS: Work, About, Experience, Writing, Contact)
    ========================================================================= */
@@ -61,10 +123,10 @@ function WorkLeftPage() {
         </h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 isolate">
         <Link
           href="#contact"
-          className="relative inline-flex items-center justify-center gap-2 h-12 max-w-full px-7 text-[16px] font-sans font-semibold text-[#111] bg-[#FDB4C3] active:bg-[rgba(255,120,160,1)] border border-[#111] rounded-none cursor-pointer select-none outline-none after:content-[''] after:block after:absolute after:-top-0.5 after:left-0 after:w-full after:h-12 after:bg-[#111] after:rounded-none after:-z-10 after:translate-x-1.5 after:translate-y-1.5 after:transition-transform after:duration-200 hover:after:translate-x-0 hover:after:translate-y-0"
+          className="relative inline-flex items-center justify-center gap-2 h-12 max-w-full px-7 text-[16px] font-sans font-semibold text-[#111] bg-[#FDB4C3] active:bg-[rgba(255,120,160,1)] border border-[#111] rounded-none cursor-pointer select-none outline-none after:content-[''] after:block after:absolute after:top-0 after:left-0 after:w-full after:h-full after:bg-[#111] after:rounded-none after:-z-10 after:translate-x-2 after:translate-y-2 after:transition-transform after:duration-200 hover:after:translate-x-0 hover:after:translate-y-0"
         >
           <span>Let&apos;s collaborate</span>
         </Link>
@@ -452,6 +514,11 @@ export default function Hero({
         paused: true,
       });
 
+      // Ensure center spine crease starts completely hidden when pages are flat
+      if (spineRef.current) {
+        gsap.set(spineRef.current, { opacity: 0 });
+      }
+
       // 4 turns: each turn takes 1 unit of timeline time (total 4)
       leaves.forEach((leaf, i) => {
         const shadowFront = shadowFrontRefs.current[i];
@@ -471,60 +538,87 @@ export default function Hero({
           i
         );
 
-        // Dynamic paper curvature shadow
+        // Dynamic paper curvature shadow (appears right as leaf bends along the spine)
         if (shadowFront) {
-          tl.fromTo(
+          tl.to(
             shadowFront,
-            { opacity: 0 },
             {
-              opacity: 0.22,
-              duration: 0.5,
-              ease: "power1.in",
+              opacity: 1,
+              duration: 0.12,
+              ease: "power1.out",
             },
             i
           ).to(
             shadowFront,
             {
               opacity: 0,
-              duration: 0.05,
+              duration: 0.13,
+              ease: "power1.in",
             },
-            i + 0.5
+            i + 0.12
           );
         }
 
         if (shadowBack) {
-          tl.fromTo(
+          tl.to(
             shadowBack,
-            { opacity: 0.22 },
-            {
-              opacity: 0,
-              duration: 0.5,
-              ease: "power1.out",
-            },
-            i + 0.5
-          );
-        }
-
-        // Spine depth effect (fades in when page begins to turn, fades out when it lands flat)
-        if (spineRef.current) {
-          tl.fromTo(
-            spineRef.current,
-            { opacity: 0 },
             {
               opacity: 1,
-              duration: 0.25,
-              ease: "power1.in",
-            },
-            i
-          ).to(
-            spineRef.current,
-            {
-              opacity: 0,
-              duration: 0.25,
+              duration: 0.13,
               ease: "power1.out",
             },
             i + 0.75
+          ).to(
+            shadowBack,
+            {
+              opacity: 0,
+              duration: 0.12,
+              ease: "power1.in",
+            },
+            i + 0.88
           );
+        }
+
+        // Spine bend & crease effect:
+        // Visible ONLY when the user is about to turn the page a little bit (first ~15-25% of turn)
+        // Hidden when flat and throughout mid-air flight
+        if (spineRef.current) {
+          tl.to(
+            spineRef.current,
+            {
+              opacity: 1,
+              duration: 0.12,
+              ease: "power1.out",
+            },
+            i
+          )
+            .to(
+              spineRef.current,
+              {
+                opacity: 0,
+                duration: 0.13,
+                ease: "power1.in",
+              },
+              i + 0.12
+            )
+            .to(
+              spineRef.current,
+              {
+                opacity: 1,
+                duration: 0.13,
+                ease: "power1.out",
+              },
+              i + 0.75
+            )
+            .to(
+              spineRef.current,
+              {
+                opacity: 0,
+                duration: 0.12,
+                ease: "power1.in",
+              },
+              i + 0.88
+            );
         }
 
         // Once settled at -180deg on the left stack, set resting z-index
@@ -583,247 +677,379 @@ export default function Hero({
       className="relative w-full min-h-screen py-6 sm:py-8 lg:py-10 flex flex-col justify-center overflow-hidden"
     >
       <div className="w-full max-w-[1560px] mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="relative flex items-start justify-center md:pl-10 lg:pl-11">
-          {/* Main Diary Folder Jacket */}
-          <div
-            style={{ backgroundColor: activeColor }}
-            className="flex-1 min-w-0 rounded-3xl sm:rounded-4xl p-4 sm:p-6 lg:p-8 shadow-[0_16px_48px_rgba(0,0,0,0.06)] transition-colors duration-500 relative z-10"
-          >
-            {/* Paper Stack Wrapper (Tactile layered stationery depth) */}
-            <div className="relative w-full max-w-5xl xl:max-w-6xl mx-auto my-1 sm:my-2">
-              {/* Paper Stack Layer 1 (Bottom peeking sheet, rotated -1.4deg) */}
+        <div className="relative flex items-start justify-center">
+          {/* Main Book Spread Wrapper (Centered with generous clearance for left & right flaps) */}
+          <div className="relative w-full max-w-6xl xl:max-w-7xl 2xl:max-w-370 mx-auto my-1 sm:my-2 px-10 sm:px-12 md:px-14 lg:px-16">
+            {/* DESKTOP 2-PAGE BOOK SPREAD (Hinged at Fixed Center Spine) */}
+            <div
+              className="hidden md:block relative z-10 w-full min-h-175 lg:min-h-190 xl:min-h-197.5 2xl:min-h-202.5 rounded-[8px] shadow-[0_16px_48px_rgba(0,0,0,0.08)]"
+              style={{ perspective: "2200px" }}
+            >
+              {/* 1. Base Left Page (Bottom-most left: Work Left — Peach Divider) */}
               <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-[#F2EEE4] rounded-none rotate-[-1.4deg] translate-y-2 translate-x-1 border border-black/5 shadow-[0_6px_20px_rgba(0,0,0,0.05)] pointer-events-none"
-              />
-
-              {/* Paper Stack Layer 2 (Middle peeking sheet, rotated +1.1deg) */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-[#FAF7F0] rounded-none rotate-[1.1deg] translate-y-1 -translate-x-1 border border-black/4 shadow-[0_4px_14px_rgba(0,0,0,0.04)] pointer-events-none"
-              />
-
-              {/* DESKTOP 2-PAGE BOOK SPREAD (Hinged at Fixed Center Spine) */}
-              <div
-                className="hidden md:block relative z-10 w-full min-h-170 lg:min-h-180 xl:min-h-190 rounded-none shadow-[0_4px_24px_rgba(0,0,0,0.04)]"
-                style={{ perspective: "2200px" }}
+                className="absolute top-0 left-0 w-1/2 h-full rounded-l-[8px] pt-5 pb-5 pl-8 sm:pt-7 sm:pb-7 sm:pl-10 md:pl-14 lg:pt-10 lg:pb-10 lg:pl-18 xl:pt-11 xl:pb-11 xl:pl-22 2xl:pl-24 pr-0 z-10"
+                style={{ backgroundColor: NAVIGATION_ITEMS[0].theme.active }}
               >
-                {/* 1. Base Left Page (Bottom-most left: Work Left) */}
-                <div className="absolute top-0 left-0 w-1/2 h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden z-10">
+                <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden">
                   <WorkLeftPage />
-                </div>
-
-                {/* 2. Base Right Page (Bottom-most right: Contact Right) */}
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden z-10">
-                  <ContactRightPage />
-                </div>
-
-                {/* 3. The 4 3D Turning Leaves (Hinged at Fixed Center Spine: transformOrigin 'left center') */}
-                {/* LEAF 0: Front = Work Right, Back = About Left */}
-                <div
-                  ref={(el) => {
-                    leafRefs.current[0] = el;
-                  }}
-                  className="absolute top-0 right-0 w-1/2 h-full origin-left"
-                  style={{
-                    transformStyle: "preserve-3d",
-                    transformOrigin: "left center",
-                    willChange: "transform",
-                    zIndex: 24,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "translateZ(1px)",
-                    }}
-                  >
-                    <WorkRightPage />
-                    <div
-                      ref={(el) => {
-                        shadowFrontRefs.current[0] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "rotateY(180deg) translateZ(1px)",
-                    }}
-                  >
-                    <AboutLeftPage />
-                    <div
-                      ref={(el) => {
-                        shadowBackRefs.current[0] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                </div>
-
-                {/* LEAF 1: Front = About Right, Back = Experience Left */}
-                <div
-                  ref={(el) => {
-                    leafRefs.current[1] = el;
-                  }}
-                  className="absolute top-0 right-0 w-1/2 h-full origin-left"
-                  style={{
-                    transformStyle: "preserve-3d",
-                    transformOrigin: "left center",
-                    willChange: "transform",
-                    zIndex: 23,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "translateZ(1px)",
-                    }}
-                  >
-                    <AboutRightPage />
-                    <div
-                      ref={(el) => {
-                        shadowFrontRefs.current[1] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "rotateY(180deg) translateZ(1px)",
-                    }}
-                  >
-                    <ExperienceLeftPage />
-                    <div
-                      ref={(el) => {
-                        shadowBackRefs.current[1] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                </div>
-
-                {/* LEAF 2: Front = Experience Right, Back = Writing Left */}
-                <div
-                  ref={(el) => {
-                    leafRefs.current[2] = el;
-                  }}
-                  className="absolute top-0 right-0 w-1/2 h-full origin-left"
-                  style={{
-                    transformStyle: "preserve-3d",
-                    transformOrigin: "left center",
-                    willChange: "transform",
-                    zIndex: 22,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "translateZ(1px)",
-                    }}
-                  >
-                    <ExperienceRightPage />
-                    <div
-                      ref={(el) => {
-                        shadowFrontRefs.current[2] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "rotateY(180deg) translateZ(1px)",
-                    }}
-                  >
-                    <WritingLeftPage />
-                    <div
-                      ref={(el) => {
-                        shadowBackRefs.current[2] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                </div>
-
-                {/* LEAF 3: Front = Writing Right, Back = Contact Left */}
-                <div
-                  ref={(el) => {
-                    leafRefs.current[3] = el;
-                  }}
-                  className="absolute top-0 right-0 w-1/2 h-full origin-left"
-                  style={{
-                    transformStyle: "preserve-3d",
-                    transformOrigin: "left center",
-                    willChange: "transform",
-                    zIndex: 21,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "translateZ(1px)",
-                    }}
-                  >
-                    <WritingRightPage />
-                    <div
-                      ref={(el) => {
-                        shadowFrontRefs.current[3] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                  <div
-                    className="absolute inset-0 bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      WebkitBackfaceVisibility: "hidden",
-                      transform: "rotateY(180deg) translateZ(1px)",
-                    }}
-                  >
-                    <ContactLeftPage />
-                    <div
-                      ref={(el) => {
-                        shadowBackRefs.current[3] = el;
-                      }}
-                      className="absolute inset-0 bg-black pointer-events-none opacity-0"
-                    />
-                  </div>
-                </div>
-
-                {/* 4. FIXED CENTER SPINE (Depth & crease only visible while turning, hidden when flat) */}
-                <div
-                  ref={spineRef}
-                  aria-hidden="true"
-                  className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 sm:w-10 z-30 pointer-events-none opacity-0"
-                  style={{
-                    background:
-                      "linear-gradient(to right, transparent, rgba(0, 0, 0, 0.04) 25%, rgba(0, 0, 0, 0.16) 50%, rgba(0, 0, 0, 0.04) 75%, transparent)",
-                  }}
-                >
-                  {/* Spine Center Dashed Stitch Seam */}
-                  <div className="absolute top-4 bottom-4 left-1/2 -translate-x-1/2 w-px border-r border-dashed border-black/25" />
                 </div>
               </div>
 
-              {/* MOBILE SINGLE PAGE CARD VIEW (Screens < md) */}
-              <div className="md:hidden relative z-10 w-full bg-gray-50 rounded-none dotted-paper-pattern p-6 border border-black/5 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+              {/* 2. Base Right Page (Bottom-most right: Contact Right — Pink Divider) */}
+              <div
+                className="absolute top-0 right-0 w-1/2 h-full rounded-r-[8px] pt-5 pb-5 pr-8 sm:pt-7 sm:pb-7 sm:pr-10 md:pr-14 lg:pt-10 lg:pb-10 lg:pr-18 xl:pt-11 xl:pb-11 xl:pr-22 2xl:pr-24 pl-0 z-10"
+                style={{ backgroundColor: NAVIGATION_ITEMS[4].theme.active }}
+              >
+                <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden">
+                  <ContactRightPage />
+                </div>
+                {/* Static Right Flap for Contact (Item 4, Pink) */}
+                <RightFlap
+                  item={NAVIGATION_ITEMS[4]}
+                  slotIndex={4}
+                  onTabClick={handleTabClick}
+                />
+              </div>
+
+              {/* 3. The 4 3D Turning Leaves (Hinged at Fixed Center Spine: transformOrigin 'left center') */}
+              {/* LEAF 0: Front = Work Right (Peach Divider), Back = About Left (Lavender Divider) */}
+              <div
+                ref={(el) => {
+                  leafRefs.current[0] = el;
+                }}
+                className="absolute top-0 right-0 w-1/2 h-full origin-left"
+                style={{
+                  transformStyle: "preserve-3d",
+                  transformOrigin: "left center",
+                  willChange: "transform",
+                  zIndex: 24,
+                }}
+              >
+                {/* FRONT FACE: Peach divider with Work Right page + Peach flap */}
+                <div
+                  className="absolute inset-0 rounded-r-[8px] pt-5 pb-5 pr-8 sm:pt-7 sm:pb-7 sm:pr-10 md:pr-14 lg:pt-10 lg:pb-10 lg:pr-18 xl:pt-11 xl:pb-11 xl:pr-22 2xl:pr-24 pl-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[0].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden">
+                    <WorkRightPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowFrontRefs.current[0] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-r-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <RightFlap
+                    item={NAVIGATION_ITEMS[0]}
+                    slotIndex={0}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+
+                {/* BACK FACE: Lavender divider with About Left page + Peach flap on left */}
+                <div
+                  className="absolute inset-0 rounded-l-[8px] pt-5 pb-5 pl-8 sm:pt-7 sm:pb-7 sm:pl-10 md:pl-14 lg:pt-10 lg:pb-10 lg:pl-18 xl:pt-11 xl:pb-11 xl:pl-22 2xl:pl-24 pr-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[1].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg) translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden">
+                    <AboutLeftPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowBackRefs.current[0] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-l-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to left, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <LeftFlap
+                    item={NAVIGATION_ITEMS[0]}
+                    slotIndex={0}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+              </div>
+
+              {/* LEAF 1: Front = About Right (Lavender Divider), Back = Experience Left (Mint Divider) */}
+              <div
+                ref={(el) => {
+                  leafRefs.current[1] = el;
+                }}
+                className="absolute top-0 right-0 w-1/2 h-full origin-left"
+                style={{
+                  transformStyle: "preserve-3d",
+                  transformOrigin: "left center",
+                  willChange: "transform",
+                  zIndex: 23,
+                }}
+              >
+                {/* FRONT FACE: Lavender divider with About Right page + Lavender flap */}
+                <div
+                  className="absolute inset-0 rounded-r-[8px] pt-5 pb-5 pr-8 sm:pt-7 sm:pb-7 sm:pr-10 md:pr-14 lg:pt-10 lg:pb-10 lg:pr-18 xl:pt-11 xl:pb-11 xl:pr-22 2xl:pr-24 pl-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[1].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden">
+                    <AboutRightPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowFrontRefs.current[1] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-r-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <RightFlap
+                    item={NAVIGATION_ITEMS[1]}
+                    slotIndex={1}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+
+                {/* BACK FACE: Mint divider with Experience Left page + Lavender flap on left */}
+                <div
+                  className="absolute inset-0 rounded-l-[8px] pt-5 pb-5 pl-8 sm:pt-7 sm:pb-7 sm:pl-10 md:pl-14 lg:pt-10 lg:pb-10 lg:pl-18 xl:pt-11 xl:pb-11 xl:pl-22 2xl:pl-24 pr-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[2].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg) translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden">
+                    <ExperienceLeftPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowBackRefs.current[1] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-l-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to left, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <LeftFlap
+                    item={NAVIGATION_ITEMS[1]}
+                    slotIndex={1}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+              </div>
+
+              {/* LEAF 2: Front = Experience Right (Mint Divider), Back = Writing Left (Ochre Divider) */}
+              <div
+                ref={(el) => {
+                  leafRefs.current[2] = el;
+                }}
+                className="absolute top-0 right-0 w-1/2 h-full origin-left"
+                style={{
+                  transformStyle: "preserve-3d",
+                  transformOrigin: "left center",
+                  willChange: "transform",
+                  zIndex: 22,
+                }}
+              >
+                {/* FRONT FACE: Mint divider with Experience Right page + Mint flap */}
+                <div
+                  className="absolute inset-0 rounded-r-[8px] pt-5 pb-5 pr-8 sm:pt-7 sm:pb-7 sm:pr-10 md:pr-14 lg:pt-10 lg:pb-10 lg:pr-18 xl:pt-11 xl:pb-11 xl:pr-22 2xl:pr-24 pl-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[2].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden">
+                    <ExperienceRightPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowFrontRefs.current[2] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-r-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <RightFlap
+                    item={NAVIGATION_ITEMS[2]}
+                    slotIndex={2}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+
+                {/* BACK FACE: Ochre divider with Writing Left page + Mint flap on left */}
+                <div
+                  className="absolute inset-0 rounded-l-[8px] pt-5 pb-5 pl-8 sm:pt-7 sm:pb-7 sm:pl-10 md:pl-14 lg:pt-10 lg:pb-10 lg:pl-18 xl:pt-11 xl:pb-11 xl:pl-22 2xl:pl-24 pr-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[3].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg) translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden">
+                    <WritingLeftPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowBackRefs.current[2] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-l-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to left, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <LeftFlap
+                    item={NAVIGATION_ITEMS[2]}
+                    slotIndex={2}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+              </div>
+
+              {/* LEAF 3: Front = Writing Right (Ochre Divider), Back = Contact Left (Pink Divider) */}
+              <div
+                ref={(el) => {
+                  leafRefs.current[3] = el;
+                }}
+                className="absolute top-0 right-0 w-1/2 h-full origin-left"
+                style={{
+                  transformStyle: "preserve-3d",
+                  transformOrigin: "left center",
+                  willChange: "transform",
+                  zIndex: 21,
+                }}
+              >
+                {/* FRONT FACE: Ochre divider with Writing Right page + Ochre flap */}
+                <div
+                  className="absolute inset-0 rounded-r-[8px] pt-5 pb-5 pr-8 sm:pt-7 sm:pb-7 sm:pr-10 md:pr-14 lg:pt-10 lg:pb-10 lg:pr-18 xl:pt-11 xl:pb-11 xl:pr-22 2xl:pr-24 pl-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[3].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-r border-black/5 overflow-hidden">
+                    <WritingRightPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowFrontRefs.current[3] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-r-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to right, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <RightFlap
+                    item={NAVIGATION_ITEMS[3]}
+                    slotIndex={3}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+
+                {/* BACK FACE: Pink divider with Contact Left page + Ochre flap on left */}
+                <div
+                  className="absolute inset-0 rounded-l-[8px] pt-5 pb-5 pl-8 sm:pt-7 sm:pb-7 sm:pl-10 md:pl-14 lg:pt-10 lg:pb-10 lg:pl-18 xl:pt-11 xl:pb-11 xl:pl-22 2xl:pl-24 pr-0"
+                  style={{
+                    backgroundColor: NAVIGATION_ITEMS[4].theme.active,
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg) translateZ(1px)",
+                  }}
+                >
+                  <div className="w-full h-full bg-gray-50 dotted-paper-pattern rounded-none border-t border-b border-l border-black/5 overflow-hidden">
+                    <ContactLeftPage />
+                  </div>
+                  <div
+                    ref={(el) => {
+                      shadowBackRefs.current[3] = el;
+                    }}
+                    className="absolute inset-0 pointer-events-none opacity-0 rounded-l-[8px]"
+                    style={{
+                      background:
+                        "linear-gradient(to left, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 15%, transparent 40%)",
+                    }}
+                  />
+                  <LeftFlap
+                    item={NAVIGATION_ITEMS[3]}
+                    slotIndex={3}
+                    onTabClick={handleTabClick}
+                  />
+                </div>
+              </div>
+
+              {/* 4. FIXED CENTER SPINE (Crease upon the continuous white page) */}
+              <div
+                ref={spineRef}
+                aria-hidden="true"
+                className="absolute top-5 bottom-5 sm:top-7 sm:bottom-7 lg:top-10 lg:bottom-10 xl:top-11 xl:bottom-11 left-1/2 -translate-x-1/2 w-8 sm:w-10 z-30 pointer-events-none opacity-0"
+                style={{
+                  background:
+                    "linear-gradient(to right, transparent, rgba(0, 0, 0, 0.04) 25%, rgba(0, 0, 0, 0.16) 50%, rgba(0, 0, 0, 0.04) 75%, transparent)",
+                }}
+              >
+                {/* Spine Center Dashed Stitch Seam */}
+                <div className="absolute top-3 bottom-3 left-1/2 -translate-x-1/2 w-px border-r border-dashed border-black/25" />
+              </div>
+            </div>
+
+            {/* MOBILE SINGLE PAGE CARD VIEW (Screens < md) */}
+            <div
+              style={{
+                backgroundColor:
+                  NAVIGATION_ITEMS[activePageIndex]?.theme.active || activeColor,
+              }}
+              className="md:hidden relative z-10 w-full rounded-[8px] p-4 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-colors duration-500"
+            >
+              {/* Mobile Quick Section Switcher */}
+              <div className="flex items-center justify-between gap-1 mb-4 pb-2 border-b border-black/10 overflow-x-auto">
+                {NAVIGATION_ITEMS.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    onClick={(e) => handleTabClick(item.id, e)}
+                    style={{
+                      backgroundColor: activePageIndex === idx ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.3)",
+                    }}
+                    className={`px-2.5 py-1 text-[11px] font-mono font-medium uppercase tracking-wider rounded-[6px] transition-colors ${
+                      activePageIndex === idx ? "text-ink font-bold shadow-xs" : "text-ink/70 hover:text-ink"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="w-full bg-gray-50 rounded-none dotted-paper-pattern p-6 border border-black/5 shadow-xs">
                 {activePageIndex === 0 && (
                   <div className="space-y-6">
                     <WorkLeftPage />
@@ -857,33 +1083,6 @@ export default function Hero({
               </div>
             </div>
           </div>
-
-          {/* Diary Side Flaps Navigation (Docked to the Right Edge like an Authentic Diary) */}
-          <nav
-            aria-label="Diary Section Tabs"
-            className="hidden md:flex flex-col gap-2 -ml-px pt-10 sm:pt-14 sticky top-10 sm:top-14 z-20 shrink-0"
-          >
-            {NAVIGATION_ITEMS.map((item) => {
-              return (
-                <div
-                  key={item.id}
-                  className="relative filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.04)]"
-                >
-                  <Link
-                    href={item.href}
-                    onClick={(e) => handleTabClick(item.id, e)}
-                    aria-label={item.label}
-                    className="relative flex items-center justify-center w-10 sm:w-11 h-26 sm:h-28 py-3 text-ink select-none cursor-pointer"
-                  >
-                    <SideTabShape fillColor={item.theme.active} />
-                    <span className="relative z-10 text-[11px] sm:text-[12px] font-medium tracking-wider uppercase [writing-mode:vertical-rl] rotate-180 select-none text-ink/85">
-                      {item.label}
-                    </span>
-                  </Link>
-                </div>
-              );
-            })}
-          </nav>
         </div>
       </div>
     </section>
