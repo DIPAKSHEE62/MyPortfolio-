@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar, { NAVIGATION_ITEMS } from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const [activeItemId, setActiveItemId] = useState<string>("work");
@@ -18,6 +19,7 @@ export default function Home() {
         activeItemId={activeItemId}
         onSelectTab={setActiveItemId}
       />
+      <Footer />
     </main>
   );
 }

@@ -116,7 +116,6 @@ export default function Navbar({
       });
     }
   }, [isMobileMenuOpen]);
-
   return (
     <header
       className={`md:hidden sticky top-0 z-40 w-full transition-all duration-200 ${
@@ -130,7 +129,7 @@ export default function Navbar({
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
           aria-expanded={isMobileMenuOpen}
           aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-          className="flex items-center justify-center w-9 h-9 rounded-lg text-ink border border-hairline hover:bg-surface-card transition-colors"
+          className="flex items-center justify-center w-9 h-9 rounded-none text-ink border border-hairline hover:bg-surface-card transition-colors"
         >
           {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
@@ -158,7 +157,7 @@ export default function Navbar({
                     setIsMobileMenuOpen(false);
                   }}
                   aria-current={isActive ? "page" : undefined}
-                  className="relative flex items-center justify-between w-full h-12 px-6 text-[15px] font-medium text-ink rounded-xl transition-all"
+                  className="relative flex items-center justify-between w-full h-12 px-6 text-[15px] font-medium text-ink rounded-none transition-all"
                   style={{
                     backgroundColor: isActive
                       ? item.theme.active
@@ -174,7 +173,7 @@ export default function Navbar({
                     </span>
                   </div>
                   {isActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-ink" />
+                    <span className="w-1.5 h-1.5 rounded-none bg-ink" />
                   )}
                 </Link>
               </div>
