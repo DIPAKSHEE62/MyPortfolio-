@@ -19,7 +19,7 @@ export default function Footer() {
 
   return (
     <footer className="relative w-full bg-[#161618] text-white border-t border-dashed border-white/15 py-12 sm:py-16 select-none">
-      <div className="w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 pb-10 border-b border-white/10">
           {/* Colophon & Identity (Columns 1-7) */}

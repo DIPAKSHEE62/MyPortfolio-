@@ -471,13 +471,13 @@ export default function TimeGreeting({
     >
       {/* Handwritten cursive prefix with Google's Italianno font */}
       <span
-        className={`good-prefix ${italianno.className} text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[96px] font-normal text-red-600 leading-[0.95] tracking-tight`}
+        className={`good-prefix ${italianno.className} text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal text-red-600 leading-[0.95] tracking-tight`}
       >
         Good
       </span>
 
       {/* Dynamic Graphic SVG positioned directly below the prefix */}
-      <div className="flex items-center max-w-full h-16 sm:h-22 md:h-28 lg:h-36 xl:h-40 mt-1 sm:mt-2 overflow-visible">
+      <div className="flex items-center max-w-full h-16 sm:h-20 md:h-24 lg:h-30 xl:h-36 2xl:h-42 mt-1 sm:mt-1.5 xl:mt-2.5 overflow-visible">
         {timeOfDay === "morning" && (
           <MorningSvg className="h-full w-auto max-w-full object-contain" />
         )}
